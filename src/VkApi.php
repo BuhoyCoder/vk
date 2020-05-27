@@ -4,7 +4,7 @@ namespace BuhoyCoder\VK;
 
 class VkApi
 {
-	private $api_version = '5.103';
+	private $api_version = '5.107';
 
 	private $api_token;
 	
