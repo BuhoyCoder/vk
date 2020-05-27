@@ -261,4 +261,13 @@ class VkApi
 
 		return $this->api('messages.send', $params);
 	}
+	
+	public function getConversationMembers(int $peer_id, array $params)
+	{
+		if (array_key_exists('fields', $params) && is_array($params['fields'])) {
+			$params['fields'] = \implode(', ', $params['fields']);
+		}
+
+		return $this->api('messages.getConversationMembers', ['peer_id' => $peer_id] + $params);
+	}
 }
