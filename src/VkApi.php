@@ -4,11 +4,9 @@ namespace BuhoyCoder\VK;
 
 class VkApi
 {
-	private const API_VERSION = '5.103';
+	private $api_version = '5.103';
 
 	private $api_token;
-	
-	private $api_version;
 	
 	private $ch;
 
@@ -18,10 +16,9 @@ class VkApi
 		]
 	];
 
-	public function __construct(string $api_token, string $api_version = self::API_VERSION)
+	public function __construct(string $api_token)
 	{
 		$this->api_token = $api_token;
-		$this->api_version = $api_version;
 		
 		$this->ch = curl_init();
 	}
@@ -29,6 +26,11 @@ class VkApi
 	public function __destruct()
 	{
 		curl_close($this->ch);
+	}
+	
+	public function setApiVersion()
+	{
+		$this->api_version = $api_version;
 	}
 	
 	public function api(string $method, array $params = [])
