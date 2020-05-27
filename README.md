@@ -24,8 +24,6 @@ const CONFIRM_STR = ''; //ключ авторизации сообщества, 
 
 Посмотрите на этот пример:
 ```php
-require_once 'vendor/autoload.php';
-
 use BuhoyCoder\VK\VkApi;
 use BuhoyCoder\VK\Context;
 use BuhoyCoder\VK\Callback;
