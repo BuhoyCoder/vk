@@ -18,18 +18,24 @@ require_once 'vk-master/autoload.php'; //Подключаем библиотек
 const VK_KEY = ''; //токен сообщества или пользователя
 const CONFIRM_STR = ''; //ключ авторизации сообщества, который вы получили
 ```
+### VK API
+```php
+$vk = new BuhoyCoder\VK\VkApi(VK_KEY);
+
+$vk->sendMessage([
+    'user_id' => 487483102,
+    'message' => 'Hello World!'
+]);
+```
 ### Callback API
 Обработчик CallbackApi будет ждать уведомления о событиях из формы ВКонтакте.
 Как только событие произошло, вы будете уведомлены о нем и сможете его обработать.
 
 Посмотрите на этот пример:
 ```php
-use BuhoyCoder\VK\VkApi;
 use BuhoyCoder\VK\Context;
-use BuhoyCoder\VK\Callback;
 
-$vk = new VkApi(VK_KEY);
-$callback = new Callback($vk, CONFIRM_STR);
+$callback = new BuhoyCoder\VK\Callback(VK_KEY, CONFIRM_STR);
 
 $callback->on('message_new', function (Context $ctx) {
     $ctx->replyMessage('ok');
