@@ -1,0 +1,18 @@
+{
+    "name": "buhoycoder/vk",
+    "type": "library",
+    "description": "Library for easy work with VK com api",
+    "license": "MIT",
+    "minimum-stability": "stable",
+    "authors": [
+        {
+            "name": "Buhoy",
+            "homepage": "https://vk.com/b.buhoy"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "BuhoyCoder\\vk\\": "src/"
+        }
+    }
+}
