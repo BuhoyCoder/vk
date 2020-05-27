@@ -10,7 +10,7 @@ class Callback
 	
 	private $debug_mode;
 	
-	public function __construct(VkApi $vk, string $confirm_str = '', bool $debug_mode = false)
+	public function __construct(string $api_token, string $confirm_str = '', bool $debug_mode = false)
 	{
 		$this->debug_mode = $debug_mode;
 		$this->data = json_decode(file_get_contents('php://input'), true);
@@ -21,7 +21,7 @@ class Callback
 		
 		$this->closeRequest();
 		
-		$this->ctx = new Context($vk, $this->data);
+		$this->ctx = new Context(new VkApi($api_token), $this->data);
 	}
 	
 	private function closeRequest()
