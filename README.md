@@ -17,10 +17,14 @@ require_once 'vk-master/autoload.php'; //Подключаем библиотек
 ```php
 const VK_KEY = ''; //токен сообщества или пользователя
 const CONFIRM_STR = ''; //ключ авторизации сообщества, который вы получили
+
+use BuhoyCoder\VK\VkApi;
+use BuhoyCoder\VK\Context;
+use BuhoyCoder\VK\Callback;
 ```
 ### VK API
 ```php
-$vk = new BuhoyCoder\VK\VkApi(VK_KEY);
+$vk = new VkApi(VK_KEY);
 
 $vk->sendMessage([
     'user_id' => 487483102,
@@ -33,9 +37,7 @@ $vk->sendMessage([
 
 Посмотрите на этот пример:
 ```php
-use BuhoyCoder\VK\Context;
-
-$callback = new BuhoyCoder\VK\Callback(VK_KEY, CONFIRM_STR);
+$callback = new Callback(VK_KEY, CONFIRM_STR);
 
 $callback->on('message_new', function (Context $ctx) {
     $ctx->replyMessage('ok');
