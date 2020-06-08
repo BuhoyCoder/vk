@@ -15,7 +15,11 @@ class Callback
 		$this->debug_mode = $debug_mode;
 		$this->data = json_decode(file_get_contents('php://input'), true);
 
-		if ($this->data['type'] === 'confirmation') {
+		if (!isset($this->data)) {
+			exit('No callback request.');
+		}
+
+		if ($this->data['type'] === EventType::CONFIRMATION) {
 			exit($confirm_str);
 		}
 		
