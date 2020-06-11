@@ -4,16 +4,16 @@ namespace BuhoyCoder\VK;
 
 class Context
 {
-	private $data = [];
-	
 	public $vk;
+
+	private $data = [];
 
 	private $cache = [];
 	
 	public function __construct(VkApi $vk, array $data)
 	{
+		$this->vk   = $vk;
 		$this->data = $data;
-		$this->vk = $vk;
 	}
 	
 	public function getData()
@@ -75,6 +75,15 @@ class Context
 		return $this->cache['from_id'] = $this->getMessage()['from_id'];
 	}
 	
+	public function getChatId()
+	{
+		if (array_key_exists('chat_id', $this->cache)) {
+			return $this->cache['chat_id'];
+		}
+
+		return $this->cache['chat_id'] = ($this->getPeerId() > 2e9) ? $this->getPeerId() - 2e9 : 0;
+	}
+	
 	public function getText()
 	{
 		if (array_key_exists('text', $this->cache)) {
@@ -100,6 +109,15 @@ class Context
 			? json_decode($this->getMessage()['payload'], true)
 			: null;
 	}
+	
+	public function getAction()
+	{
+		if (array_key_exists('action', $this->cache)) {
+			return $this->cache['action'];
+		}
+
+		return $this->cache['action'] = !empty($this->getMessage()['action']) ? $this->getMessage()['action'] : null;
+	}
 
 	public function getCommand()
 	{
@@ -108,7 +126,7 @@ class Context
 	
 	public function markAsReadMessage()
 	{
-		if ($this->getType() !== 'message_new') {
+		if ($this->getType() !== EventType::MESSAGE_NEW) {
 			return false;
 		}
 
@@ -118,31 +136,9 @@ class Context
 		]);
 	}
 	
-	public function getOnlineStatusGroup()
-	{
-		return $this->vk->api('groups.getOnlineStatus', [
-			'group_id' => $this->getGroupId()
-		]);
-	}
-
-	public function enableOnlineGroup()
-	{
-		$status = $this->getOnlineStatusGroup()['status'];
-
-		if ($status === 'none') {
-			return $this->vk->api('groups.enableOnline', [
-				'group_id' => $this->getGroupId()
-			]);
-		} else if ($status === 'online') {
-			return true;
-		}
-
-		return false;
-	}
-	
 	public function replyMessage(string $message = '', array $params = [])
 	{
-		if ($this->getType() !== 'message_new') {
+		if ($this->getType() !== EventType::MESSAGE_NEW) {
 			return;
 		}
 		
@@ -154,16 +150,16 @@ class Context
 	
 	public function isChat() : bool
 	{
-		return ($this->getType() !== 'message_new') ? false : $this->getPeerId() > 2e9;
+		return ($this->getType() !== EventType::MESSAGE_NEW) ? false : $this->getPeerId() > 2e9;
 	}
 
 	public function onPayload(string $name, callable $handler)
 	{
-		if ($this->getType() !== 'message_new') {
+		if ($this->getType() !== EventType::MESSAGE_NEW) {
 			return;
 		}
 
-		if (empty($this->getPayload()['command'])) {
+		if (!isset($this->getPayload()['command'])) {
 			return;
 		}
 
@@ -177,12 +173,12 @@ class Context
 	
 	public function onCommand(string $command, callable $handler)
 	{
-		if ($this->getType() !== 'message_new' || $this->getText() === NULL) {
+		if ($this->getType() !== EventType::MESSAGE_NEW || $this->getText() === null) {
 			return;
 		}
 
-		$oneCommands = explode(' ', $command);
-		$twoCommands = explode(' ', mb_strtolower($this->getText()));
+		$oneCommands   = explode(' ', $command);
+		$twoCommands   = explode(' ', mb_strtolower($this->getText()));
 		$countCommands = count($oneCommands);
 
 		if ($countCommands > 1) {
@@ -198,11 +194,32 @@ class Context
 		}
 		
 		if ($isCommand) {
-			$this->cache['command'] = trim(mb_substr($this->getText(), 0, mb_strlen($command)));
-			$this->cache['text']    = trim(mb_substr($this->getText(), mb_strlen($command)));
+			$lengthCommand = mb_strlen($command);
+			$this->cache['command'] = trim(mb_substr($this->getText(), 0, $lengthCommand));
+			$this->cache['text']    = trim(mb_substr($this->getText(), $lengthCommand));
 
 			$handler($this);
 			exit;
 		}
+	}
+	
+	public function onText(string $text, callable $handler, bool $case_sensitive = false)
+	{
+		if ($this->getType() !== EventType::MESSAGE_NEW || $this->getText() === null) {
+			return;
+		}
+
+		$name_func = ($case_sensitive) ? 'mb_strpos' : 'mb_stripos';
+		$pos       = $name_func($this->getText(), $text);
+
+		if ($pos !== false) {
+			$handler($this);
+			exit;
+		}
+	}
+
+	public function isMessagesFromGroupAllowed(int $user_id)
+	{
+		return $this->vk->isMessagesFromGroupAllowed($this->getGroupId(), $user_id);
 	}
 }
