@@ -4,7 +4,7 @@ namespace BuhoyCoder\VK;
 
 class VkApi
 {
-	private $api_version = '5.107';
+	private $api_version = '5.110';
 
 	private $api_token;
 	
@@ -256,18 +256,61 @@ class VkApi
 	public function sendMessage(array $params)
 	{
 		if (array_key_exists('user_ids', $params) && is_array($params['user_ids'])) {
-			$params['user_ids'] = \implode(', ', $params['user_ids']);
+			$params['user_ids'] = implode(', ', $params['user_ids']);
 		}
 
 		return $this->api('messages.send', $params);
 	}
 	
-	public function getConversationMembers(int $peer_id, array $params)
+	public function getConversationMembers(int $peer_id, $fields = null, int $group_id = 0)
 	{
-		if (array_key_exists('fields', $params) && is_array($params['fields'])) {
-			$params['fields'] = \implode(', ', $params['fields']);
+		$parametrs = [
+			'peer_id' => $peer_id
+		];
+
+		if (is_array($fields)) {
+			$parametrs['fields'] = implode(', ', $fields);
+		} else if ($fields !== null) {
+			$parametrs['fields'] = $fields;
 		}
 
-		return $this->api('messages.getConversationMembers', ['peer_id' => $peer_id] + $params);
+		if ($group_id !== 0) {
+			$parametrs['group_id'] = $group_id;
+		}
+
+		return $this->api('messages.getConversationMembers', $parametrs);
 	}
+	
+	public function getUsers($user_ids = null, $fields = null, string $name_case = null)
+	{
+		$parametrs = [];
+
+		if (is_array($user_ids)) {
+			$parametrs['user_ids'] = implode(', ', $user_ids);
+		} else if ($user_ids !== null) {
+			$parametrs['user_ids'] = $user_ids;
+		}
+
+		if (is_array($fields)) {
+			$parametrs['fields'] = implode(', ', $fields);
+		} else if ($fields !== null) {
+			$parametrs['fields'] = $fields;
+		}
+
+		if ($name_case !== null) {
+			$parametrs['name_case'] = $name_case;
+		}
+
+		return $this->api('users.get', $parametrs);
+	}
+	
+	public function isMessagesFromGroupAllowed(int $group_id, int $user_id)
+	{
+		return $this->api('messages.isMessagesFromGroupAllowed', [
+			'group_id' => $group_id,
+			'user_id'  => $user_id
+		]);
+	}
+
+
 }
