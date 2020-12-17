@@ -195,6 +195,11 @@ class VkApi
 		return ['text', $payload, $text, $color];
 	}
 
+	public function buttonOpenLink(string $text, $link, $payload = null)
+	{
+		return ['open_link', $payload, $text, $link];
+	    }
+
 	public function generateKeyboard($buttons = [], $inline = false, $one_time = false)
 	{
 		$keyboard = [];
@@ -238,6 +243,12 @@ class VkApi
 						if(isset($button[5])) {
 							$keyboard[$i][$j]['action']['hash'] = $button[5];
 						}
+						break;
+					}
+					
+					case 'open_link': {
+						$keyboard[$i][$j]["action"]["label"] = $button[2];
+						$keyboard[$i][$j]["action"]["link"] = $button[3];
 						break;
 					}
 				}
