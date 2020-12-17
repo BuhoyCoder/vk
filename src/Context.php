@@ -148,6 +148,11 @@ class Context
 		return $this->vk->sendMessage($params);
 	}
 	
+	public function reply(string $message = '', array $params = [])
+	{
+		return $this->replyMessage($message, $params);
+	}
+	
 	public function isChat() : bool
 	{
 		return ($this->getType() !== EventType::MESSAGE_NEW) ? false : $this->getPeerId() > 2e9;
